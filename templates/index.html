@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Translation and Summarization</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex; /* Enables flexbox */
+            justify-content: center; /* Horizontally centers the child */
+            align-items: center; /* Vertically centers the child */
+            height: 100vh; /* Full viewport height */
+            box-sizing: border-box; /* Ensure padding/borders fit within dimensions */
+            text-align: center; /* Center text alignment */
+        }
+
+        /* Centered Box */
+        .container {
+            width: 90%; /* Responsive width */
+            max-width: 800px; /* Limit width to 800px */
+            background-color: #1e1e1e; /* Dark background */
+            border-radius: 10px; /* Rounded corners */
+            padding: 20px; /* Inner padding */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.7); /* Drop shadow for aesthetics */
+            text-align: center; /* Align text inside */
+        }
+
+        /* Title */
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Form */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 1rem;
+            color: #e0e0e0;
+            background-color: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #6200ea;
+        }
+
+        /* Dropdown */
+        label {
+            font-size: 1rem;
+            color: #cccccc;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 5px;
+            outline: none;
+            width: 100%;
+        }
+
+        select:hover,
+        select:focus {
+            border-color: #6200ea;
+        }
+
+        /* Submit Button */
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3700b3;
+        }
+
+        /* Output Section */
+        #outputSection {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #ffffff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>News Summarization and Translation</h1>
+        <form id="nlpForm">
+            <textarea id="newsInput" placeholder="Paste your news article here" rows="10" cols="50"></textarea><br>
+            <label for="targetLanguage">Target Language:</label>
+            <select id="targetLanguage">
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="de">German</option>
+            </select><br><br>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="outputSection">
+            <h2>Translated Text</h2>
+            <p id="translatedOutput"></p>
+            <h2>Summary</h2>
+            <p id="summaryOutput"></p>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#outputSection').hide();
+
+            $('#nlpForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const newsText = $('#newsInput').val();
+                const targetLang = $('#targetLanguage').val();
+
+                if (newsText.trim() === '') {
+                    alert('Please paste a news article to process.');
+                    return;
+                }
+
+                $('#outputSection').show();
+                $('#translatedOutput').text('Processing translation...');
+                $('#summaryOutput').text('Processing summarization...');
+
+                $.ajax({
+                    url: '/process',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        article: newsText,
+                        target_language: targetLang
+                    }),
+                    success: function (response) {
+                        $('#translatedOutput').text(response.translated_text);
+                        $('#summaryOutput').text(response.summary);
+                    },
+                    error: function () {
+                        alert('An error occurred while processing the article.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
